@@ -1,9 +1,39 @@
 <!doctype html>
 <html>  
 	<head>
-		
+		<meta charset="UTF-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<title>Union Arena Deckbuilder</title>
+		<link href="assets/css/general.css" rel="stylesheet">
 	</head>
 	<body>
+		<div class="navbar" id="navbar"></div>
 		
+		<script>
+			function renderNavbar(isLoggedIn) {
+				const navbar = document.getElementById("navbar");
+				navbar.innerHTML = '';
+				const deckLink = document.createElement("a");
+				deckLink.href = "deckbuilder.html";
+				deckLink.textContent = "Deck Builder";
+				navbar.appendChild(deckLink);
+	
+				const myDecksLink = document.createElement("a");
+				myDecksLink.href = "mydecks.html";
+				myDecksLink.textContent = "My Decks";
+				navbar.appendChild(myDecksLink);
+	
+				const authLink = document.createElement("a");
+				authLink.href = isLoggedIn ? "profile.html" : "login.html";
+				authLink.textContent = isLoggedIn ? "My Profile" : "Login";
+				navbar.appendChild(authLink);
+			}
+	
+			window.onload = function () {
+				const isLoggedIn = false; // Change to true to simulate a logged-in user
+				renderNavbar(isLoggedIn);
+				loadMoreCards();
+			}
+		</script>
 	</body>
 </html>

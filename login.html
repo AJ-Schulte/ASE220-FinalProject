@@ -1,9 +1,88 @@
-<!doctype html>
-<html>  
-	<head>
-		
-	</head>
-	<body>
-		
-	</body>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Login / Sign Up</title>
+  <link href="assets/css/general.css" rel="stylesheet">
+  <style>
+	body {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+    }
+  </style>
+</head>
+<body>
+  <div class="navbar" id="navbar"></div>
+
+  <div class="auth-box" id="auth-box">
+    <h2 id="form-title">Login</h2>
+    <input type="text" id="username" placeholder="Username">
+    <input type="email" id="email" placeholder="Email" style="display: none;">
+    <input type="password" id="password" placeholder="Password">
+    <button onclick="handleAuth()">Login</button>
+    <div class="switch-mode" onclick="toggleAuthMode()">Don't have an account? Sign up</div>
+  </div>
+
+  <script>
+    let isLogin = true;
+
+    function toggleAuthMode() {
+      isLogin = !isLogin;
+      document.getElementById('form-title').textContent = isLogin ? "Login" : "Sign Up";
+      document.querySelector('button').textContent = isLogin ? "Login" : "Sign Up";
+      document.querySelector('.switch-mode').textContent = isLogin
+        ? "Don't have an account? Sign up"
+        : "Already have an account? Login";
+      document.getElementById('email').style.display = isLogin ? "none" : "block";
+    }
+
+    function handleAuth() {
+      const username = document.getElementById('username').value.trim();
+      const password = document.getElementById('password').value.trim();
+      const email = document.getElementById('email').value.trim();
+
+      if (!username || !password || (!isLogin && !email)) {
+        alert("Please fill in all required fields.");
+        return;
+      }
+
+      if (isLogin) {
+        alert(`Logging in:\nUsername: ${username}\nPassword: ${password}`);
+        // Insert actual login logic here
+      } else {
+        alert(`Signing up:\nUsername: ${username}\nPassword: ${password}\nEmail: ${email}`);
+        // Insert actual signup logic here
+      }
+    }
+
+	function renderNavbar(isLoggedIn) {
+            const navbar = document.getElementById("navbar");
+            navbar.innerHTML = '';
+            const deckLink = document.createElement("a");
+            deckLink.href = "deckbuilder.html";
+            deckLink.textContent = "Deck Builder";
+            navbar.appendChild(deckLink);
+
+            const myDecksLink = document.createElement("a");
+            myDecksLink.href = "mydecks.html";
+            myDecksLink.textContent = "My Decks";
+            navbar.appendChild(myDecksLink);
+
+            const authLink = document.createElement("a");
+            authLink.href = isLoggedIn ? "profile.html" : "login.html";
+            authLink.textContent = isLoggedIn ? "My Profile" : "Login";
+            navbar.appendChild(authLink);
+        }
+
+        window.onload = function () {
+            const isLoggedIn = false; // Change to true to simulate a logged-in user
+            renderNavbar(isLoggedIn);
+            loadMoreCards();
+        }
+  </script>
+</body>
 </html>
