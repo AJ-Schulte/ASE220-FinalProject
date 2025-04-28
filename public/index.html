@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Deck Builder</title>
+  <link href="assets/css/general.css" rel="stylesheet">
+</head>
+<body>
+
+  <div class="navbar" id="navbar">
+    <a href="deckbuilder.html">Deck Builder</a>
+    <a href="mydecks.html">My Decks</a>
+    <a href="profile.html">My Profile</a>
+  </div>
+
+  <div class="main-container">
+    <div class="card-list">
+      <div class="filter-section">
+        <select id="setFilter">
+          <option value="">All Sets</option>
+          <option value="BLC">BLC</option>
+          <option value="HTR">HTR</option>
+          <option value="JJK">JJK</option>
+          <option value="CGH">CGH</option>
+          <option value="KMY">KMY</option>
+          <option value="OPM">OPM</option>
+          <option value="SAO">SAO</option>
+        </select>
+      </div>
+
+      <div class="card-grid" id="cardGrid"></div>
+
+      <div class="load-more">
+        <button onclick="loadMoreCards()">Load More</button>
+      </div>
+    </div>
+
+    <div class="deck-list-cards" id="deckList">
+      <!-- Selected deck cards go here -->
+    </div>
+  </div>
+
+  <script>
+    const allCards = Array.from({ length: 300 }, (_, i) => ({
+      id: i + 1,
+      name: `Card ${i + 1}`,
+      set: ['BLC', 'HTR', 'JJK', 'CGH', 'KMY', 'OPM', 'SAO'][i % 7],
+      image: `https://via.placeholder.com/150x200?text=Card+${i + 1}`
+    }));
+
+    const deck = {};
+    let cardsLoaded = 0;
+    const cardsPerLoad = 50;
+
+    function renderCards() {
+      const cardGrid = document.getElementById("cardGrid");
+      const filterSet = document.getElementById("setFilter").value;
+      const filteredCards = allCards.filter(card => !filterSet || card.set === filterSet);
+
+      const cardsToShow = filteredCards.slice(0, cardsLoaded);
+
+      cardGrid.innerHTML = "";
+
+      cardsToShow.forEach(card => {
+        const cardDiv = document.createElement("div");
+        cardDiv.className = "card";
+
+        const img = document.createElement("img");
+        img.src = card.image;
+        img.alt = card.name;
+
+        const name = document.createElement("div");
+        name.textContent = card.name;
+
+        const buttonsDiv = document.createElement("div");
+        buttonsDiv.className = "card-buttons";
+
+        const addBtn = document.createElement("button");
+        addBtn.textContent = "+";
+        addBtn.onclick = () => addToDeck(card);
+
+        const removeBtn = document.createElement("button");
+        removeBtn.textContent = "-";
+        removeBtn.onclick = () => removeFromDeck(card);
+
+        buttonsDiv.appendChild(addBtn);
+        buttonsDiv.appendChild(removeBtn);
+
+        cardDiv.appendChild(img);
+        cardDiv.appendChild(name);
+        cardDiv.appendChild(buttonsDiv);
+
+        cardGrid.appendChild(cardDiv);
+      });
+    }
+
+    function loadMoreCards() {
+      cardsLoaded += cardsPerLoad;
+      renderCards();
+    }
+
+    function addToDeck(card) {
+      if (!deck[card.id]) {
+        deck[card.id] = { ...card, quantity: 0 };
+      }
+      deck[card.id].quantity++;
+      renderDeck();
+    }
+
+    function removeFromDeck(card) {
+      if (deck[card.id]) {
+        deck[card.id].quantity--;
+        if (deck[card.id].quantity <= 0) {
+          delete deck[card.id];
+        }
+        renderDeck();
+      }
+    }
+
+    function renderDeck() {
+      const deckList = document.getElementById("deckList");
+      deckList.innerHTML = "";
+      Object.values(deck).forEach(card => {
+        const deckCard = document.createElement("div");
+        deckCard.className = "deck-card";
+
+        const title = document.createElement("div");
+        title.textContent = `${card.name} x${card.quantity}`;
+
+        deckCard.appendChild(title);
+        deckList.appendChild(deckCard);
+      });
+    }
+
+    document.getElementById("setFilter").addEventListener("change", () => {
+      cardsLoaded = cardsPerLoad;
+      renderCards();
+    });
+
+    window.onload = function () {
+      cardsLoaded = cardsPerLoad;
+      renderCards();
+    }
+  </script>
+
+</body>
+</html>

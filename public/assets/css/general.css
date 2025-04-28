@@ -1,0 +1,205 @@
+body {
+    margin: 0;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #0f0f1b;
+    color: white;
+    display: flex;
+    height: 100vh;
+    overflow: hidden;
+    flex-direction: column;
+  }
+
+  .navbar {
+    background-color: #1c1e2d;
+    padding: 10px 20px;
+    display: flex;
+    justify-content: flex-end;
+    gap: 15px;
+    width: 100%;
+    position: fixed;
+    top: 0;
+    border-bottom: 2px solid #222436;
+    z-index: 1000;
+  }
+
+  .navbar a {
+    background-color: #2b2f40;
+    color: white;
+    text-decoration: none;
+    padding: 10px 15px;
+    border-radius: 6px;
+    font-weight: bold;
+  }
+
+  .navbar a:hover {
+    background-color: #3a3d4a;
+  }
+
+  .main-container {
+    display: flex;
+    flex: 1;
+    margin-top: 60px;
+    overflow: hidden;
+  }
+
+  .card-list {
+    width: 30%;
+    padding: 20px;
+    overflow-y: auto;
+    background-color: #0f0f1b;
+  }
+
+  .deck-list {
+    width: 30%;
+    padding: 20px;
+    overflow-y: auto;
+    background-color: #0f0f1b;
+    border-left: 2px solid #222436;
+  }
+
+  .filter-section {
+    position: sticky;
+    top: 0;
+    background-color: #0f0f1b;
+    padding-bottom: 10px;
+    z-index: 10;
+  }
+
+  .filter-section select {
+    width: 100%;
+    padding: 10px;
+    background-color: #2b2f40;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    font-weight: bold;
+  }
+
+  .card-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 15px;
+    margin-top: 10px;
+  }
+
+  .card {
+    background-color: #1c1e2d;
+    padding: 10px;
+    border-radius: 8px;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .card img {
+    width: 100%;
+    border-radius: 6px;
+  }
+
+  .card-buttons {
+    margin-top: 10px;
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+  }
+
+  .card-buttons button {
+    padding: 5px 10px;
+    background-color: #2b2f40;
+    border: none;
+    color: white;
+    cursor: pointer;
+    border-radius: 5px;
+    font-weight: bold;
+  }
+
+  .card-buttons button:hover {
+    background-color: #3a3d4a;
+  }
+
+  .deck-card {
+    background-color: #1c1e2d;
+    padding: 10px;
+    margin-bottom: 10px;
+    border-radius: 8px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .load-more {
+    margin: 20px auto;
+    text-align: center;
+  }
+
+  .load-more button {
+    background-color: #2b2f40;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 6px;
+    font-weight: bold;
+    cursor: pointer;
+  }
+
+  .load-more button:hover {
+    background-color: #3a3d4a;
+  }
+  .auth-box {
+    background-color: #1c1e2d;
+    padding: 30px;
+    margin-top: 100px; /* Leave space for navbar */
+    border-radius: 10px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 300px;
+    box-shadow: 0 0 10px rgba(0,0,0,0.5);
+  }
+
+  .auth-box h2 {
+    margin-bottom: 20px;
+  }
+
+  .auth-box input {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 15px;
+    background-color: #2b2f40;
+    border: none;
+    border-radius: 6px;
+    color: white;
+    font-size: 14px;
+  }
+
+  .auth-box input::placeholder {
+    color: #aaa;
+  }
+
+  .auth-box button {
+    width: 100%;
+    padding: 10px;
+    background-color: #2b2f40;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    font-weight: bold;
+    cursor: pointer;
+    font-size: 16px;
+  }
+
+  .auth-box button:hover {
+    background-color: #3a3d4a;
+  }
+
+  .switch-mode {
+    margin-top: 15px;
+    font-size: 14px;
+    cursor: pointer;
+    color: #aaa;
+  }
+
+  .switch-mode:hover {
+    color: #fff;
+  }

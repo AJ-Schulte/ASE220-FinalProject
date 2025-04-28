@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>My Profile</title>
+  <link href="assets/css/general.css" rel="stylesheet">
+  <link href="assets/css/profile.css" rel="stylesheet">
+</head>
+
+<body>
+  <div class="navbar" id="navbar"></div>
+
+  <div class="profile-box" id="profile-box">
+    <h2>My Profile</h2>
+    <div class="profile-info">
+      <p id="profile-username">Username: Loading...</p>
+      <p id="profile-email">Email: Loading...</p>
+    </div>
+    <a href="mydecks.html" class="view-decks-button">View My Decks</a>
+  </div>
+
+  <script>
+    function renderNavbar(isLoggedIn) {
+      const navbar = document.getElementById("navbar");
+      navbar.innerHTML = '';
+
+      const deckLink = document.createElement("a");
+      deckLink.href = "deckbuilder.html";
+      deckLink.textContent = "Deck Builder";
+      navbar.appendChild(deckLink);
+
+      const myDecksLink = document.createElement("a");
+      myDecksLink.href = "mydecks.html";
+      myDecksLink.textContent = "My Decks";
+      navbar.appendChild(myDecksLink);
+
+      const authLink = document.createElement("a");
+      authLink.href = isLoggedIn ? "profile.html" : "login.html";
+      authLink.textContent = isLoggedIn ? "My Profile" : "Login";
+      navbar.appendChild(authLink);
+    }
+
+    function loadProfile() {
+      // Simulate fetching user data
+      const userData = {
+        username: "TestUser",   // You would fetch real user data here
+        email: "testuser@example.com"
+      };
+
+      document.getElementById("profile-username").textContent = `Username: ${userData.username}`;
+      document.getElementById("profile-email").textContent = `Email: ${userData.email}`;
+    }
+
+    window.onload = function () {
+      const isLoggedIn = true; // Assume user is logged in
+      renderNavbar(isLoggedIn);
+      loadProfile();
+    }
+  </script>
+</body>
+</html>

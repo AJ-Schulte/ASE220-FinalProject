@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Decks</title>
+    <link href="assets/css/decklist.css" rel="stylesheet">
+</head>
+<body>
+    <div class="navbar" id="navbar">
+        <!-- Links will be dynamically inserted here -->
+    </div>
+    <div class="deck-list" id="deckList">
+        <!-- Deck items will be inserted here -->
+    </div>
+
+    <script>
+        const decks = [
+            "Switch", "Integrity Knights", "Yamamoto/Kenpachi",
+            "Saitama Yellow", "Lancelot", "Tatsumaki/Fubuki",
+            "Saitama Green", "Kurapika Green", "Megumi",
+            "Pizza", "Chrollo Troupe Purple", "Toshi Kenpachi"
+        ];
+
+        function renderNavbar(isLoggedIn) {
+            const navbar = document.getElementById("navbar");
+            navbar.innerHTML = '';
+            const deckLink = document.createElement("a");
+            deckLink.href = "deckbuilder.html";
+            deckLink.textContent = "Deck Builder";
+            navbar.appendChild(deckLink);
+
+            const myDecksLink = document.createElement("a");
+            myDecksLink.href = "mydecks.html";
+            myDecksLink.textContent = "My Decks";
+            navbar.appendChild(myDecksLink);
+
+            const authLink = document.createElement("a");
+            authLink.href = isLoggedIn ? "profile.html" : "login.html";
+            authLink.textContent = isLoggedIn ? "My Profile" : "Login";
+            navbar.appendChild(authLink);
+        }
+
+        function renderDecks() {
+            const list = document.getElementById("deckList");
+            decks.forEach((deck, index) => {
+                const deckItem = document.createElement("div");
+                deckItem.className = "deck-item";
+
+                const title = document.createElement("div");
+                title.className = "deck-title";
+                title.textContent = deck;
+
+                const buttons = document.createElement("div");
+                buttons.className = "deck-buttons";
+
+                const viewBtn = document.createElement("a");
+                viewBtn.className = "view-button";
+                viewBtn.textContent = "View Deck";
+                viewBtn.href = `deckbuilder.html?deckid=${index}`;
+
+                const delBtn = document.createElement("button");
+                delBtn.className = "delete-button";
+                delBtn.textContent = "Delete Deck";
+                delBtn.onclick = () => {
+                    deckItem.remove();
+                };
+
+                buttons.appendChild(viewBtn);
+                buttons.appendChild(delBtn);
+                deckItem.appendChild(title);
+                deckItem.appendChild(buttons);
+                list.appendChild(deckItem);
+            });
+        }
+
+        window.onload = function () {
+            const isLoggedIn = true;
+            renderNavbar(isLoggedIn);
+            renderDecks();
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,70 @@
+
+body {
+    margin: 0;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #0f0f1b;
+    color: white;
+}
+.navbar {
+    background-color: #1c1e2d;
+    padding: 10px 20px;
+    display: flex;
+    justify-content: flex-end;
+    gap: 15px;
+    border-bottom: 2px solid #222436;
+}
+.navbar a {
+    background-color: #2b2f40;
+    color: white;
+    text-decoration: none;
+    padding: 10px 15px;
+    border-radius: 6px;
+    font-weight: bold;
+}
+.navbar a:hover {
+    background-color: #3a3d4a;
+}
+.deck-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    padding: 20px;
+}
+.deck-item {
+    background-color: #1c1e2d;
+    padding: 15px;
+    border-radius: 8px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border: 1px solid #2c2f45;
+}
+.deck-title {
+    font-size: 18px;
+    font-weight: bold;
+}
+.deck-buttons {
+    display: flex;
+    gap: 10px;
+}
+.delete-button, .view-button {
+    padding: 8px 12px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-weight: bold;
+}
+.delete-button {
+    background-color: #e74c3c;
+    color: white;
+}
+.delete-button:hover {
+    background-color: #c0392b;
+}
+.view-button {
+    background-color: #3498db;
+    color: white;
+}
+.view-button:hover {
+    background-color: #2980b9;
+}
