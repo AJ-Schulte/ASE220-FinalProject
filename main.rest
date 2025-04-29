@@ -1,0 +1,64 @@
+### GET User
+GET http://127.0.0.1:3000/users/AJSchulte
+
+### GET specific decklist from one user
+GET http://127.0.0.1:3000/users/AJSchulte/decklists/Integrity%20Knights
+
+### GET All decklists from specified user
+GET http://127.0.0.1:3000/users/AJSchulte/decklists
+
+### GET All cards
+GET http://127.0.0.1:3000/cards
+
+### POST New User
+POST http://127.0.0.1:3000/users/createUser
+Content-Type: application/json
+
+{
+  "username": "TempUser",
+  "password": "tempuserpassword",
+  "email": "tempuser@email.com"
+}
+
+### POST New Decklist
+POST http://127.0.0.1:3000/decklists/newDecklist
+Content-Type: application/json
+
+{
+    "decklist":[
+        {"cardname":"UE07BT_SAO-1-035","quantity":{"$numberInt":"4"}},
+        {"cardname":"UE07BT_SAO-1-036","quantity":{"$numberInt":"3"}},
+        {"cardname":"UE07BT_SAO-1-037","quantity":{"$numberInt":"4"}},
+        {"cardname":"UE07BT_SAO-1-039","quantity":{"$numberInt":"4"}},
+        {"cardname":"UE07BT_SAO-1-040","quantity":{"$numberInt":"3"}},
+        {"cardname":"UE07BT_SAO-1-041","quantity":{"$numberInt":"4"}},
+        {"cardname":"UE07BT_SAO-1-044","quantity":{"$numberInt":"4"}},
+        {"cardname":"UE07BT_SAO-1-047","quantity":{"$numberInt":"2"}},
+        {"cardname":"UE07BT_SAO-1-048","quantity":{"$numberInt":"3"}},
+        {"cardname":"UE07ST_SAO-1-101","quantity":{"$numberInt":"4"}},
+        {"cardname":"UE07ST_SAO-1-104","quantity":{"$numberInt":"4"}},
+        {"cardname":"UE07BT_SAO-1-063","quantity":{"$numberInt":"4"}},
+        {"cardname":"UE07BT_SAO-1-065","quantity":{"$numberInt":"4"}},
+        {"cardname":"UE07ST_SAO-1-109","quantity":{"$numberInt":"3"}}],
+    "deckname":"Switch",
+    "username":"TempUser"
+}
+
+### PUT Update Existing User
+PUT http://127.0.0.1:3000/users/TempUser
+Content-Type: application/json
+
+{
+    "email":"tempuser@gmail.com"
+}
+
+### PUT Update existing deck
+PUT http://127.0.0.1:3000/users/TempUser/decklists/Switch
+Content-Type: application/json
+
+{
+    "deckname":"Kirito/Asuna Switch"
+}
+
+### DELETE Existing Deck
+DELETE http://127.0.0.1:3000/users/AJSchulte/decklists/Integrity%20Knights%202

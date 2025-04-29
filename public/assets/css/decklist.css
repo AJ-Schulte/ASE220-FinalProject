@@ -7,23 +7,29 @@ body {
 }
 .navbar {
     background-color: #1c1e2d;
-    padding: 10px 20px;
+    padding: 10px 0px;
     display: flex;
     justify-content: flex-end;
     gap: 15px;
+    width: 100%;
+    position: fixed;
+    top: 0;
     border-bottom: 2px solid #222436;
-}
-.navbar a {
+    z-index: 1000;
+  }
+
+  .navbar a {
     background-color: #2b2f40;
     color: white;
     text-decoration: none;
-    padding: 10px 15px;
+    padding: 10px 20px;
     border-radius: 6px;
     font-weight: bold;
-}
-.navbar a:hover {
+  }
+
+  .navbar a:hover {
     background-color: #3a3d4a;
-}
+  }
 .deck-list {
     display: flex;
     flex-direction: column;

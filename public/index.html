@@ -8,11 +8,7 @@
 </head>
 <body>
 
-  <div class="navbar" id="navbar">
-    <a href="deckbuilder.html">Deck Builder</a>
-    <a href="mydecks.html">My Decks</a>
-    <a href="profile.html">My Profile</a>
-  </div>
+  <div class="navbar" id="navbar"></div>
 
   <div class="main-container">
     <div class="card-list">
@@ -42,12 +38,9 @@
   </div>
 
   <script>
-    const allCards = Array.from({ length: 300 }, (_, i) => ({
-      id: i + 1,
-      name: `Card ${i + 1}`,
-      set: ['BLC', 'HTR', 'JJK', 'CGH', 'KMY', 'OPM', 'SAO'][i % 7],
-      image: `https://via.placeholder.com/150x200?text=Card+${i + 1}`
-    }));
+    const allCards = await fetch('/cards', {
+      method: 'GET'
+    });
 
     const deck = {};
     let cardsLoaded = 0;
@@ -133,6 +126,25 @@
       });
     }
 
+    function renderNavbar(isLoggedIn) {
+      const navbar = document.getElementById("navbar");
+      navbar.innerHTML = '';
+      const deckLink = document.createElement("a");
+      deckLink.href = "index.html";
+      deckLink.textContent = "Deck Builder";
+      navbar.appendChild(deckLink);
+
+      const myDecksLink = document.createElement("a");
+      myDecksLink.href = "mydecks.html";
+      myDecksLink.textContent = "My Decks";
+      navbar.appendChild(myDecksLink);
+
+      const authLink = document.createElement("a");
+      authLink.href = isLoggedIn ? "profile.html" : "login.html";
+      authLink.textContent = isLoggedIn ? "My Profile" : "Login";
+      navbar.appendChild(authLink);
+    }
+
     document.getElementById("setFilter").addEventListener("change", () => {
       cardsLoaded = cardsPerLoad;
       renderCards();
@@ -140,6 +152,8 @@
 
     window.onload = function () {
       cardsLoaded = cardsPerLoad;
+      const isLoggedIn = false; 
+      renderNavbar(isLoggedIn);
       renderCards();
     }
   </script>

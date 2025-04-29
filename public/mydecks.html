@@ -7,12 +7,8 @@
     <link href="assets/css/decklist.css" rel="stylesheet">
 </head>
 <body>
-    <div class="navbar" id="navbar">
-        <!-- Links will be dynamically inserted here -->
-    </div>
-    <div class="deck-list" id="deckList">
-        <!-- Deck items will be inserted here -->
-    </div>
+    <div class="navbar" id="navbar"></div>
+    <div class="deck-list" id="deckList"></div>
 
     <script>
         const decks = [
@@ -26,7 +22,7 @@
             const navbar = document.getElementById("navbar");
             navbar.innerHTML = '';
             const deckLink = document.createElement("a");
-            deckLink.href = "deckbuilder.html";
+            deckLink.href = "index.html";
             deckLink.textContent = "Deck Builder";
             navbar.appendChild(deckLink);
 

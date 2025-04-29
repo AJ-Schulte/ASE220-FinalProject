@@ -58,11 +58,30 @@
 
       if (isLogin) {
         alert(`Logging in:\nUsername: ${username}\nPassword: ${password}`);
-        // Insert actual login logic here
+        login(username, password);
       } else {
         alert(`Signing up:\nUsername: ${username}\nEmail: ${email}\nPassword: ${password}`);
-        // Insert actual signup logic here
+        signUp(username, password, email);
       }
+    }
+
+    async function login(username, password) {
+      const response = await fetch('/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username: `${username}`, password: `${password}` })
+      });
+
+      const data = await response.json();
+      localStorage.setItem('token', data.token);
+    }
+
+    async function signUp(username, password, email) {
+      const response = await fetch('/users/createUser', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({username: `${username}`, password: `${password}`, email: `${email}`})
+      });
     }
 
     function renderNavbar(isLoggedIn) {
@@ -70,7 +89,7 @@
       navbar.innerHTML = '';
 
       const deckLink = document.createElement("a");
-      deckLink.href = "deckbuilder.html";
+      deckLink.href = "index.html";
       deckLink.textContent = "Deck Builder";
       navbar.appendChild(deckLink);
 
@@ -86,7 +105,7 @@
     }
 
     window.onload = function () {
-      const isLoggedIn = false; // Change to true to simulate a logged-in user
+      const isLoggedIn = false;
       renderNavbar(isLoggedIn);
     }
   </script>
