@@ -32,19 +32,87 @@
       </div>
     </div>
 
-    <div class="deck-list-cards" id="deckList">
-      <!-- Selected deck cards go here -->
+    <div class="deck-list">
+      <div class="save-deck-container">
+        <input type="text" id="deckNameInput" placeholder="Enter deck name..." />
+        <button onclick="saveDeck()">Save Deck</button>
+        <span id="deckCount" class="deck-count">0 cards</span>
+      </div>
+    
+      <div class="deck-list-cards" id="deckList"></div>
     </div>
   </div>
 
   <script>
-    const allCards = await fetch('/cards', {
-      method: 'GET'
-    });
-
-    const deck = {};
+    let allCards = [];
+    let deck = {};
     let cardsLoaded = 0;
     const cardsPerLoad = 50;
+
+    async function init() {
+      try {
+        const res = await fetch('/cards');
+        allCards = await res.json(); 
+      } catch (err) {
+        console.error('Failed to fetch cards:', err);
+      }
+
+      cardsLoaded = cardsPerLoad;
+
+      const token = localStorage.getItem('token');
+      const userData = parseJwt(token);
+      let isLoggedIn = false;
+
+      if (userData) {
+        isLoggedIn = true;
+      }
+
+      renderNavbar(isLoggedIn);
+      renderCards();
+      await loadDeckFromQuery();
+    }
+
+    async function loadDeckFromQuery() {
+      const params = new URLSearchParams(window.location.search);
+      const deckName = params.get('deckname');
+
+      if (!deckName) return;
+
+      const token = localStorage.getItem('token');
+      const userData = parseJwt(token);
+
+      if (!userData || !userData.username) {
+        console.error("User not authenticated or token missing.");
+        return;
+      }
+
+      const username = userData.username;
+
+      try {
+        const res = await fetch(`/users/${username}/decklists/${encodeURIComponent(deckName)}`);
+
+        if (!res.ok) {
+          console.error(`Failed to fetch deck: ${res.statusText}`);
+          return;
+        }
+
+        const deckData = await res.json();
+
+        for (const key in deck) delete deck[key];
+
+        deckData.decklist.forEach(entry => {
+          const cardInfo = allCards.find(card => card.name === entry.cardname);
+          if (cardInfo) {
+            deck[entry.cardname] = { ...cardInfo, quantity: entry.quantity };
+          }
+        });
+
+        document.getElementById("deckNameInput").value = deckData.deckname;
+        renderDeck();
+      } catch (err) {
+        console.error('Error loading deck from query:', err);
+      }
+    }
 
     function renderCards() {
       const cardGrid = document.getElementById("cardGrid");
@@ -60,7 +128,7 @@
         cardDiv.className = "card";
 
         const img = document.createElement("img");
-        img.src = card.image;
+        img.src = card.path;
         img.alt = card.name;
 
         const name = document.createElement("div");
@@ -94,18 +162,22 @@
     }
 
     function addToDeck(card) {
-      if (!deck[card.id]) {
-        deck[card.id] = { ...card, quantity: 0 };
+      if (!deck[card.name]) {
+        deck[card.name] = { ...card, quantity: 0 };
       }
-      deck[card.id].quantity++;
+      if (deck[card.name].quantity >= 4) {
+        alert("You can only have up to 4 copies of a card in your deck.");
+        return;
+      }
+      deck[card.name].quantity++;
       renderDeck();
     }
 
     function removeFromDeck(card) {
-      if (deck[card.id]) {
-        deck[card.id].quantity--;
-        if (deck[card.id].quantity <= 0) {
-          delete deck[card.id];
+      if (deck[card.name]) {
+        deck[card.name].quantity--;
+        if (deck[card.name].quantity <= 0) {
+          delete deck[card.name];
         }
         renderDeck();
       }
@@ -114,33 +186,44 @@
     function renderDeck() {
       const deckList = document.getElementById("deckList");
       deckList.innerHTML = "";
+
+      let totalCards = 0;
       Object.values(deck).forEach(card => {
+        totalCards += card.quantity;
         const deckCard = document.createElement("div");
         deckCard.className = "deck-card";
+
+        const img = document.createElement("img");
+        img.src = card.path; 
+        img.alt = card.name;  
+        img.className = "deck-card-image";
 
         const title = document.createElement("div");
         title.textContent = `${card.name} x${card.quantity}`;
 
+        deckCard.appendChild(img);
         deckCard.appendChild(title);
         deckList.appendChild(deckCard);
       });
+      const deckCount = document.getElementById("deckCount");
+      deckCount.textContent = `${totalCards} card${totalCards !== 1 ? 's' : ''}`;
     }
 
     function renderNavbar(isLoggedIn) {
       const navbar = document.getElementById("navbar");
       navbar.innerHTML = '';
       const deckLink = document.createElement("a");
-      deckLink.href = "index.html";
+      deckLink.href = "/";
       deckLink.textContent = "Deck Builder";
       navbar.appendChild(deckLink);
 
       const myDecksLink = document.createElement("a");
-      myDecksLink.href = "mydecks.html";
+      myDecksLink.href = "/mydecks";
       myDecksLink.textContent = "My Decks";
       navbar.appendChild(myDecksLink);
 
       const authLink = document.createElement("a");
-      authLink.href = isLoggedIn ? "profile.html" : "login.html";
+      authLink.href = isLoggedIn ? "/profile" : "/login";
       authLink.textContent = isLoggedIn ? "My Profile" : "Login";
       navbar.appendChild(authLink);
     }
@@ -150,12 +233,83 @@
       renderCards();
     });
 
-    window.onload = function () {
-      cardsLoaded = cardsPerLoad;
-      const isLoggedIn = false; 
-      renderNavbar(isLoggedIn);
-      renderCards();
+    async function saveDeck() {
+      const deckName = document.getElementById("deckNameInput").value.trim();
+      const token = localStorage.getItem('token');
+      const userData = parseJwt(token);
+
+      if (!deckName) {
+        alert("Please enter a deck name.");
+        return;
+      }
+
+      if (!userData || !userData.username) {
+        alert("You must be logged in to save a deck.");
+        return;
+      }
+
+      const username = userData.username;
+      const decklist = Object.values(deck).map(card => ({
+        cardname: card.name,
+        quantity: card.quantity
+      }));
+
+      const payload = {
+        decklist: decklist,
+        deckname: deckName,
+        username: username
+      };
+
+      const encodedDeckName = encodeURIComponent(deckName);
+      const url = `/users/${encodeURIComponent(username)}/decklists/${encodedDeckName}`;
+      let method = 'POST';
+      let requestUrl = '/decklists/newDecklist';
+
+      try {
+        const checkRes = await fetch(url, {
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        });
+
+        if (checkRes.ok) {
+          method = 'PUT';
+          requestUrl = url;
+        }
+
+        const saveRes = await fetch(requestUrl, {
+          method: method,
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+          },
+          body: JSON.stringify(payload)
+        });
+
+        if (saveRes.ok) {
+          alert("Deck saved successfully!");
+        } else {
+          const error = await saveRes.text();
+          alert("Failed to save deck: " + error);
+        }
+      } catch (err) {
+        console.error("Error saving deck:", err);
+        alert("An error occurred while saving the deck.");
+      }
     }
+
+
+    function parseJwt(token) {
+      try {
+        const base64Payload = token.split('.')[1];
+        const payload = atob(base64Payload);
+        return JSON.parse(payload);
+      } catch (e) {
+        return null;
+      }
+    }
+
+    window.onload = init;
   </script>
 
 </body>

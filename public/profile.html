@@ -1,62 +1,128 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>My Profile</title>
-  <link href="assets/css/general.css" rel="stylesheet">
-  <link href="assets/css/profile.css" rel="stylesheet">
+  <link href="assets/css/general.css" rel="stylesheet" />
+  <link href="assets/css/profile.css" rel="stylesheet" />
 </head>
-
 <body>
   <div class="navbar" id="navbar"></div>
 
   <div class="profile-box" id="profile-box">
     <h2>My Profile</h2>
     <div class="profile-info">
-      <p id="profile-username">Username: Loading...</p>
-      <p id="profile-email">Email: Loading...</p>
+      <input type="text" id="username-input" placeholder="Username" />
+      <input type="email" id="email-input" placeholder="Email" />
     </div>
+    <button class="save-button" onclick="saveProfile()">Save Changes</button>
     <a href="mydecks.html" class="view-decks-button">View My Decks</a>
+    <button class="sign-out-button" onclick="signOut()">Sign Out</button>
   </div>
 
   <script>
+    let originalUsername = "";
+    let originalEmail = "";
+
     function renderNavbar(isLoggedIn) {
       const navbar = document.getElementById("navbar");
       navbar.innerHTML = '';
-
-      const deckLink = document.createElement("a");
-      deckLink.href = "index.html";
-      deckLink.textContent = "Deck Builder";
-      navbar.appendChild(deckLink);
-
-      const myDecksLink = document.createElement("a");
-      myDecksLink.href = "mydecks.html";
-      myDecksLink.textContent = "My Decks";
-      navbar.appendChild(myDecksLink);
-
-      const authLink = document.createElement("a");
-      authLink.href = isLoggedIn ? "profile.html" : "login.html";
-      authLink.textContent = isLoggedIn ? "My Profile" : "Login";
-      navbar.appendChild(authLink);
+      const links = [
+        { text: "Deck Builder", href: "/" },
+        { text: "My Decks", href: "/mydecks" },
+        { text: isLoggedIn ? "My Profile" : "Login", href: isLoggedIn ? "/profile" : "/login" }
+      ];
+      links.forEach(linkData => {
+        const a = document.createElement("a");
+        a.href = linkData.href;
+        a.textContent = linkData.text;
+        navbar.appendChild(a);
+      });
     }
 
-    function loadProfile() {
-      // Simulate fetching user data
-      const userData = {
-        username: "TestUser",   // You would fetch real user data here
-        email: "testuser@example.com"
-      };
-
-      document.getElementById("profile-username").textContent = `Username: ${userData.username}`;
-      document.getElementById("profile-email").textContent = `Email: ${userData.email}`;
+    function signOut() {
+      localStorage.removeItem('token');
+      window.location.href = "/login";
     }
 
+    function parseJwt(token) {
+      try {
+        const base64Payload = token.split('.')[1];
+        const payload = atob(base64Payload);
+        return JSON.parse(payload);
+      } catch (e) {
+        return null;
+      }
+    }
+
+    function loadProfile(userData) {
+      if (userData) {
+        originalUsername = userData.username;
+        originalEmail = userData.email;
+        document.getElementById("username-input").value = originalUsername;
+        document.getElementById("email-input").value = originalEmail;
+      } else {
+        alert("You are not logged in.");
+        window.location.href = "login.html";
+      }
+    }
+
+    async function saveProfile() {
+      const newUsername = document.getElementById("username-input").value.trim();
+      const newEmail = document.getElementById("email-input").value.trim();
+
+      if (!newUsername || !newEmail) {
+        alert("Username and email cannot be empty.");
+        return;
+      }
+
+      try {
+        const token = localStorage.getItem('token');
+        const updateUserRes = await fetch(`/users/${originalUsername}`, {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+          },
+          body: JSON.stringify({ username: newUsername, email: newEmail })
+        });
+
+        if (!updateUserRes.ok) throw new Error("Failed to update user");
+
+        const data = await updateUserRes.json();
+
+        if (data.token) {
+          localStorage.setItem('token', data.token);
+        }
+
+        if (newUsername !== originalUsername) {
+          const updateDecksRes = await fetch(`/users/${originalUsername}/decklists`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ newUsername })
+          });
+
+          if (!updateDecksRes.ok) throw new Error("Failed to update decklists");
+        }
+
+        alert("Profile updated successfully!");
+        originalUsername = newUsername;
+        originalEmail = newEmail;
+      } catch (err) {
+        console.error(err);
+        alert("An error occurred while updating your profile.");
+      }
+    }
+    
     window.onload = function () {
-      const isLoggedIn = true; // Assume user is logged in
+      const token = localStorage.getItem('token');
+      const userData = parseJwt(token);
+
+      const isLoggedIn = !!userData;
       renderNavbar(isLoggedIn);
-      loadProfile();
-    }
+      loadProfile(userData);
+    };
   </script>
 </body>
 </html>

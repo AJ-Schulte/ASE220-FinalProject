@@ -57,49 +57,70 @@
       }
 
       if (isLogin) {
-        alert(`Logging in:\nUsername: ${username}\nPassword: ${password}`);
         login(username, password);
       } else {
-        alert(`Signing up:\nUsername: ${username}\nEmail: ${email}\nPassword: ${password}`);
         signUp(username, password, email);
       }
     }
 
     async function login(username, password) {
-      const response = await fetch('/login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ username: `${username}`, password: `${password}` })
-      });
+      try {
+        const response = await fetch('/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ username, password })
+        });
 
-      const data = await response.json();
-      localStorage.setItem('token', data.token);
+        const data = await response.json();
+
+        if (response.ok && data.token) {
+          localStorage.setItem('token', data.token);
+          window.location.href = '/index.html';
+        } else {
+          alert(data.error || 'Login failed.');
+        }
+      } catch (err) {
+        console.error('Login error:', err);
+        alert('Login error.');
+      }
     }
 
     async function signUp(username, password, email) {
-      const response = await fetch('/users/createUser', {
-        method: 'POST',
-        headers: {'Content-Type': 'application/json'},
-        body: JSON.stringify({username: `${username}`, password: `${password}`, email: `${email}`})
-      });
+      try {
+        const response = await fetch('/users/createUser', {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify({ username, password, email })
+        });
+
+        const data = await response.json();
+
+        if (response.ok) {
+          alert('Sign-up successful! You can now log in.');
+        } else {
+          alert(data.error || 'Sign-up failed.');
+        }
+      } catch (err) {
+        console.error('Sign-up error:', err);
+        alert('Error creating account.');
+      }
     }
 
     function renderNavbar(isLoggedIn) {
       const navbar = document.getElementById("navbar");
       navbar.innerHTML = '';
-
       const deckLink = document.createElement("a");
-      deckLink.href = "index.html";
+      deckLink.href = "/";
       deckLink.textContent = "Deck Builder";
       navbar.appendChild(deckLink);
 
       const myDecksLink = document.createElement("a");
-      myDecksLink.href = "mydecks.html";
+      myDecksLink.href = "/mydecks";
       myDecksLink.textContent = "My Decks";
       navbar.appendChild(myDecksLink);
 
       const authLink = document.createElement("a");
-      authLink.href = isLoggedIn ? "profile.html" : "login.html";
+      authLink.href = isLoggedIn ? "/profile" : "/login";
       authLink.textContent = isLoggedIn ? "My Profile" : "Login";
       navbar.appendChild(authLink);
     }

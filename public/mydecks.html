@@ -11,41 +11,60 @@
     <div class="deck-list" id="deckList"></div>
 
     <script>
-        const decks = [
-            "Switch", "Integrity Knights", "Yamamoto/Kenpachi",
-            "Saitama Yellow", "Lancelot", "Tatsumaki/Fubuki",
-            "Saitama Green", "Kurapika Green", "Megumi",
-            "Pizza", "Chrollo Troupe Purple", "Toshi Kenpachi"
-        ];
+        let decks = [];
+        async function init() {
+            const token = localStorage.getItem('token');
+            const userData = parseJwt(token);
+            let isLoggedIn = false;
+
+            if (!userData || !userData.username) {
+                console.log('Invalid or missing token.');
+                renderNavbar(false);
+                return;
+            }
+
+            const username = userData.username;
+            isLoggedIn = true;
+            try {
+                const res = await fetch(`/users/${username}/decklists`);
+                decks = await res.json(); 
+                console.log(decks);
+            } catch (err) {
+                console.error('Failed to fetch decklists:', err);
+            }
+
+            renderNavbar(isLoggedIn);
+            renderDecks();
+        }
 
         function renderNavbar(isLoggedIn) {
             const navbar = document.getElementById("navbar");
             navbar.innerHTML = '';
             const deckLink = document.createElement("a");
-            deckLink.href = "index.html";
+            deckLink.href = "/";
             deckLink.textContent = "Deck Builder";
             navbar.appendChild(deckLink);
 
             const myDecksLink = document.createElement("a");
-            myDecksLink.href = "mydecks.html";
+            myDecksLink.href = "/mydecks";
             myDecksLink.textContent = "My Decks";
             navbar.appendChild(myDecksLink);
 
             const authLink = document.createElement("a");
-            authLink.href = isLoggedIn ? "profile.html" : "login.html";
+            authLink.href = isLoggedIn ? "/profile" : "/login";
             authLink.textContent = isLoggedIn ? "My Profile" : "Login";
             navbar.appendChild(authLink);
         }
 
         function renderDecks() {
             const list = document.getElementById("deckList");
-            decks.forEach((deck, index) => {
+            decks.forEach((deck) => {
                 const deckItem = document.createElement("div");
                 deckItem.className = "deck-item";
 
                 const title = document.createElement("div");
                 title.className = "deck-title";
-                title.textContent = deck;
+                title.textContent = deck.deckname;
 
                 const buttons = document.createElement("div");
                 buttons.className = "deck-buttons";
@@ -53,13 +72,42 @@
                 const viewBtn = document.createElement("a");
                 viewBtn.className = "view-button";
                 viewBtn.textContent = "View Deck";
-                viewBtn.href = `deckbuilder.html?deckid=${index}`;
+                viewBtn.href = `/?deckname=${deck.deckname}`;
 
                 const delBtn = document.createElement("button");
                 delBtn.className = "delete-button";
                 delBtn.textContent = "Delete Deck";
-                delBtn.onclick = () => {
-                    deckItem.remove();
+                delBtn.onclick = async () => {
+                    const token = localStorage.getItem('token');
+                    const userData = parseJwt(token);
+
+                    if (!userData || !userData.username) {
+                        alert("You must be logged in to delete a deck.");
+                        return;
+                    }
+
+                    const username = userData.username;
+
+                    try {
+                        const res = await fetch(`/users/${username}/decklists/${deck.deckname}`, {
+                            method: 'DELETE',
+                            headers: {
+                                'Authorization': `Bearer ${token}`
+                            }
+                        });
+
+                        if (res.ok) {
+                            deckItem.remove(); 
+                            decks = decks.filter(d => d.deckname !== deck.deckname);
+                            alert("Deck deleted successfully.");
+                        } else {
+                            const error = await res.text();
+                            alert("Failed to delete deck: " + error);
+                        }
+                    } catch (err) {
+                        console.error("Error deleting deck:", err);
+                        alert("An error occurred while deleting the deck.");
+                    }
                 };
 
                 buttons.appendChild(viewBtn);
@@ -69,12 +117,16 @@
                 list.appendChild(deckItem);
             });
         }
-
-        window.onload = function () {
-            const isLoggedIn = true;
-            renderNavbar(isLoggedIn);
-            renderDecks();
+        function parseJwt(token) {
+            try {
+                const base64Payload = token.split('.')[1];
+                const payload = atob(base64Payload);
+                return JSON.parse(payload);
+            } catch (e) {
+                return null;
+            }
         }
+        window.onload = init;
     </script>
 </body>
 </html>

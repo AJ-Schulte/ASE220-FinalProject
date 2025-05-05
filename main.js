@@ -1,11 +1,12 @@
 const express = require('express')
 const fs=require('fs')
 const jwt = require('jsonwebtoken');
+const SECRET_KEY = 'aosufbogw9f203rteihbw109u21hr'; 
+const authenticateToken = require('./middleware/auth');
 const app = express()
 app.use(express.json());
 app.use(express.static('public'))
 const port = 3000
-const SECRET_KEY = 'aosufbogw9f203rteihbw109u21hr';
 
 const { MongoClient, ObjectId, ServerApiVersion } = require('mongodb');
 const uri = "mongodb+srv://tempuser:Password123@cluster0.yawcomh.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0";
@@ -22,6 +23,9 @@ app.get('/mydecks', (req, res)=> {
 
 app.get('/login', (req, res)=> {
 	res.send(fs.readFileSync('./public/login.html', 'utf8'));
+})
+app.get('/profile', (req, res)=> {
+	res.send(fs.readFileSync('./public/profile.html', 'utf8'));
 })
 
 
@@ -183,25 +187,88 @@ app.get('/cards', async (req, res) => {
 		res.status(500).send('Internal server error');
 	}
 })
+app.get('/cards/:cardname', async (req, res) => {
+	if(!cardsCollection) {
+		return res.status(500).send('Database not initialized');
+	}
 
+	try {
+		const card = await cardsCollection.findOne({name: req.params.cardname});
+
+		if(card) {
+			res.json(card);
+		} else {
+			res.status(404).send('Card not found');
+		} 
+	} catch (error) {
+		console.error('Error fetching user:', error);
+		res.status(500).send('Internal server error');
+	}
+})
+app.get('/profile', authenticateToken, async (req, res) => {
+	const user = await usersCollection.findOne({ username: req.user.username });
+	res.json(user);
+  });
 
 /* API PUTS */
 app.put('/users/:username', async (req, res) => {
 	try {
-	  const username = req.params.username;
+	  const oldUsername = req.params.username;
 	  const updateFields = req.body;
+	  const newUsername = updateFields.username || oldUsername;
   
 	  const result = await usersCollection.updateOne(
-		{ username: username },          
-		{ $set: updateFields }          
+		{ username: oldUsername },
+		{ $set: updateFields }
 	  );
   
-	  res.json({ message: "User updated", modifiedCount: result.modifiedCount });
+	  const updatedUser = await usersCollection.findOne({ username: newUsername });
+  
+	  if (!updatedUser) {
+		return res.status(404).json({ error: "User not found after update" });
+	  }
+  
+	  const token = jwt.sign(
+		{ username: updatedUser.username, email: updatedUser.email },
+		SECRET_KEY, 
+		{ expiresIn: '365d' }
+	  );
+  
+	  res.json({
+		message: "User updated",
+		modifiedCount: result.modifiedCount,
+		token
+	  });
 	} catch (err) {
 	  console.error("Error updating user:", err);
 	  res.status(500).json({ error: "Internal server error" });
 	}
-});  
+  });
+  
+app.put('/users/:oldUsername/decklists', async (req, res) => {
+	try {
+	  const oldUsername = req.params.oldUsername;
+	  const newUsername = req.body.newUsername;
+  
+	  if (!newUsername) {
+		return res.status(400).json({ error: "New username is required." });
+	  }
+  
+	  const result = await decksCollection.updateMany(
+		{ username: oldUsername },
+		{ $set: { username: newUsername } }
+	  );
+  
+	  res.json({
+		message: "Decklists updated",
+		modifiedCount: result.modifiedCount
+	  });
+	} catch (err) {
+	  console.error("Error updating decklists:", err);
+	  res.status(500).json({ error: "Internal server error" });
+	}
+  });
+  
 app.put('/users/:username/decklists/:deckname', async (req, res) => {
 	try {
 	  const username = req.params.username;

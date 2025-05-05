@@ -50,12 +50,15 @@ body {
   }
 
   .deck-list {
-    width: 30%;
+    flex: 1; 
     padding: 20px;
     overflow-y: auto;
     background-color: #0f0f1b;
     border-left: 2px solid #222436;
+    display: flex;
+    flex-direction: column;
   }
+  
 
   .filter-section {
     position: sticky;
@@ -121,12 +124,19 @@ body {
   .deck-card {
     background-color: #1c1e2d;
     padding: 10px;
-    margin-bottom: 10px;
     border-radius: 8px;
+    text-align: center;
     display: flex;
-    justify-content: space-between;
+    flex-direction: column;
     align-items: center;
   }
+  
+  .deck-card img {
+    width: 100%;
+    border-radius: 6px;
+    margin-bottom: 8px;
+  }
+  
 
   .load-more {
     margin: 20px auto;
@@ -203,3 +213,51 @@ body {
   .switch-mode:hover {
     color: #fff;
   }
+  .deck-list-cards {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr); /* 5 cards per row */
+    gap: 15px;
+    padding: 20px;
+    overflow-y: auto;
+    background-color: #0f0f1b;
+  }
+  .save-deck-container {
+    margin-bottom: 15px;
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  .save-deck-container input {
+    padding: 10px;
+    border-radius: 6px;
+    border: none;
+    background-color: #2b2f40;
+    color: white;
+    font-size: 14px;
+    width: 200px;
+  }
+  
+  .save-deck-container input::placeholder {
+    color: #aaa;
+  }
+  
+  .save-deck-container button {
+    padding: 10px 20px;
+    background-color: #2b2f40;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    font-weight: bold;
+    cursor: pointer;
+  }
+  
+  .save-deck-container button:hover {
+    background-color: #3a3d4a;
+  }  
+  .deck-count {
+    font-size: 14px;
+    color: #aaa;
+  }
+  

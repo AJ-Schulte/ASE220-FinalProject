@@ -30,12 +30,14 @@ body {
   .navbar a:hover {
     background-color: #3a3d4a;
   }
-.deck-list {
+  .deck-list {
     display: flex;
     flex-direction: column;
     gap: 10px;
     padding: 20px;
+    margin-top: 70px;
 }
+
 .deck-item {
     background-color: #1c1e2d;
     padding: 15px;
