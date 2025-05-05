@@ -89,7 +89,7 @@
                     const username = userData.username;
 
                     try {
-                        const res = await fetch(`/users/${username}/decklists/${deck.deckname}`, {
+                        const res = await fetch(`/users/${username}/decklists/${encodeURIComponent(deck.deckname)}`, {
                             method: 'DELETE',
                             headers: {
                                 'Authorization': `Bearer ${token}`

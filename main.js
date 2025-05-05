@@ -291,7 +291,7 @@ app.put('/users/:username/decklists/:deckname', async (req, res) => {
 app.delete('/users/:username/decklists/:deckname', async (req, res)=> {
 	try {
 		const username = req.params.username;
-		const deckname = req.params.deckname;
+		const deckname = decodeURIComponent(req.params.deckname);
 	
 		const result = await decksCollection.deleteOne(
 		  { username: username, deckname: deckname }        
